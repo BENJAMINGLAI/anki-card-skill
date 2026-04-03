@@ -99,3 +99,38 @@ def test_parse_cards_pipe_in_html():
     assert len(cards) == 1
     assert "<code>a | b</code>" in cards[0].question
     assert cards[0].answer == "Bitwise OR"
+
+
+def test_parse_cards_cjk_full():
+    """Full CJK question, answer, and tags."""
+    text = "什么是递归？ | 函数调用自身的编程技术。 | 计算机科学::编程::递归\n"
+    cards = parse_cards(text)
+    assert len(cards) == 1
+    assert cards[0].question == "什么是递归？"
+    assert "函数调用自身" in cards[0].answer
+    assert cards[0].tags == ["计算机科学::编程::递归"]
+
+
+def test_parse_cards_mixed_cjk_english():
+    """Mixed CJK and English content."""
+    text = "What is <b>递归</b>? | A function that calls itself (递归调用). | CS::recursion\n"
+    cards = parse_cards(text)
+    assert len(cards) == 1
+    assert "递归" in cards[0].question
+    assert "递归调用" in cards[0].answer
+
+
+def test_parse_cards_emoji_in_content():
+    """Emoji characters should not break parsing."""
+    text = "What does 🔥 mean? | Fire or excitement. | slang::emoji\n"
+    cards = parse_cards(text)
+    assert len(cards) == 1
+    assert "🔥" in cards[0].question
+
+
+def test_parse_cards_japanese_korean():
+    """Japanese and Korean text."""
+    text = "日本語とは？ | 日本で使われる言語です。 | 言語::日本語\n"
+    cards = parse_cards(text)
+    assert len(cards) == 1
+    assert cards[0].tags == ["言語::日本語"]
