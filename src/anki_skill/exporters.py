@@ -3,6 +3,9 @@
 from __future__ import annotations
 
 import hashlib
+import json
+import urllib.error
+import urllib.request
 from pathlib import Path
 
 import genanki
@@ -99,3 +102,85 @@ def export_apkg(
         deck.add_note(note)
 
     genanki.Package(deck).write_to_file(str(output_path))
+
+
+def _ankiconnect_request(action: str, params: dict | None = None) -> dict:
+    """Send a request to AnkiConnect API."""
+    payload: dict = {"action": action, "version": 6}
+    if params:
+        payload["params"] = params
+    data = json.dumps(payload).encode("utf-8")
+    req = urllib.request.Request(
+        "http://localhost:8765",
+        data=data,
+        headers={"Content-Type": "application/json"},
+    )
+    with urllib.request.urlopen(req, timeout=10) as resp:
+        result = json.loads(resp.read().decode("utf-8"))
+    if result.get("error"):
+        raise RuntimeError(f"AnkiConnect error: {result['error']}")
+    return result
+
+
+def export_ankiconnect(
+    cards: list[Card],
+    deck_name: str = "AnkiSkill Export",
+) -> int:
+    """Push cards directly to Anki via AnkiConnect API.
+
+    Requires Anki to be running with AnkiConnect add-on installed.
+    Returns the number of successfully added notes.
+    """
+    # Verify AnkiConnect is reachable
+    try:
+        _ankiconnect_request("version")
+    except (urllib.error.URLError, OSError) as e:
+        raise ConnectionError(
+            "Cannot connect to AnkiConnect. "
+            "Ensure Anki is running with AnkiConnect add-on installed (code: 2055492159)."
+        ) from e
+
+    # Create deck if it doesn't exist
+    _ankiconnect_request("createDeck", {"deck": deck_name})
+
+    # Build notes
+    notes = []
+    for card in cards:
+        tags = list(card.tags)
+        if card.nidd:
+            tags.append(card.nidd)
+
+        if card.is_cloze:
+            note = {
+                "deckName": deck_name,
+                "modelName": "Cloze",
+                "fields": {
+                    "Text": card.question,
+                    "Extra": card.answer_clean,
+                },
+                "tags": tags,
+                "options": {"allowDuplicate": False, "duplicateScope": "deck"},
+            }
+        else:
+            note = {
+                "deckName": deck_name,
+                "modelName": "Basic",
+                "fields": {
+                    "Front": card.question,
+                    "Back": card.answer_clean,
+                },
+                "tags": tags,
+                "options": {"allowDuplicate": False, "duplicateScope": "deck"},
+            }
+        notes.append(note)
+
+    # Add all notes in one batch
+    result = _ankiconnect_request("addNotes", {"notes": notes})
+    note_ids = result.get("result", [])
+    added = sum(1 for nid in note_ids if nid is not None)
+    if added == 0 and len(cards) > 0:
+        raise RuntimeError(
+            "No cards were accepted by Anki. "
+            "Check that 'Basic' and 'Cloze' note types exist in your collection."
+        )
+    return added

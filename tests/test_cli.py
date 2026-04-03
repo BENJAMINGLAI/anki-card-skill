@@ -115,3 +115,16 @@ def test_cli_verbose_shows_skipped_lines():
     assert "skipped" in result.stderr.lower() or "skip" in result.stderr.lower()
     path.unlink()
     output.unlink()
+
+
+def test_cli_ankiconnect_no_output_required():
+    """--ankiconnect should not require --output."""
+    with tempfile.NamedTemporaryFile(suffix=".txt", delete=False, mode="w") as f:
+        f.write("Q1 | A1 | tag1\n")
+        path = Path(f.name)
+    # This will fail because Anki isn't running, but it should fail with exit code 4
+    # (connection error), not an argparse error about missing --output
+    result = _run_cli(str(path), "--ankiconnect")
+    assert result.returncode == 4
+    assert "connect" in result.stderr.lower() or "anki" in result.stderr.lower()
+    path.unlink()

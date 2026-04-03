@@ -27,13 +27,17 @@ def main(argv: list[str] | None = None) -> None:
     )
     parser.add_argument(
         "-o", "--output",
-        required=True,
-        help="Output file path.",
+        help="Output file path (required for tsv/apkg export).",
     )
     parser.add_argument(
         "-d", "--deck-name",
         default="AnkiSkill Export",
-        help="Deck name for APKG export (default: 'AnkiSkill Export').",
+        help="Deck name for APKG or AnkiConnect export (default: 'AnkiSkill Export').",
+    )
+    parser.add_argument(
+        "--ankiconnect",
+        action="store_true",
+        help="Push cards directly to Anki via AnkiConnect (requires Anki running).",
     )
     parser.add_argument(
         "-v", "--verbose",
@@ -42,6 +46,10 @@ def main(argv: list[str] | None = None) -> None:
     )
 
     args = parser.parse_args(argv)
+
+    # Validate: --output is required unless --ankiconnect is used
+    if not args.ankiconnect and not args.output:
+        parser.error("--output is required when not using --ankiconnect")
 
     if args.input == "-":
         text = sys.stdin.read()
@@ -58,23 +66,36 @@ def main(argv: list[str] | None = None) -> None:
         print("Error: no cards parsed from input.", file=sys.stderr)
         sys.exit(2)
 
-    output_path = Path(args.output)
-    try:
-        output_path.parent.mkdir(parents=True, exist_ok=True)
-    except OSError as e:
-        print(f"Error: cannot create output directory: {e}", file=sys.stderr)
-        sys.exit(3)
+    if args.ankiconnect:
+        from anki_skill.exporters import export_ankiconnect
 
-    try:
-        if args.format == "tsv":
-            export_tsv(cards, output_path)
-        else:
-            export_apkg(cards, output_path, deck_name=args.deck_name)
-    except OSError as e:
-        print(f"Error: cannot write output file: {e}", file=sys.stderr)
-        sys.exit(3)
+        try:
+            added = export_ankiconnect(cards, deck_name=args.deck_name)
+        except ConnectionError as e:
+            print(f"Error: {e}", file=sys.stderr)
+            sys.exit(4)
+        except RuntimeError as e:
+            print(f"Error: {e}", file=sys.stderr)
+            sys.exit(4)
+        print(f"Pushed {added}/{len(cards)} cards to Anki deck '{args.deck_name}'", file=sys.stderr)
+    else:
+        output_path = Path(args.output)
+        try:
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+        except OSError as e:
+            print(f"Error: cannot create output directory: {e}", file=sys.stderr)
+            sys.exit(3)
 
-    print(f"Exported {len(cards)} cards to {output_path}", file=sys.stderr)
+        try:
+            if args.format == "tsv":
+                export_tsv(cards, output_path)
+            else:
+                export_apkg(cards, output_path, deck_name=args.deck_name)
+        except OSError as e:
+            print(f"Error: cannot write output file: {e}", file=sys.stderr)
+            sys.exit(3)
+
+        print(f"Exported {len(cards)} cards to {output_path}", file=sys.stderr)
 
 
 if __name__ == "__main__":

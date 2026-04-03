@@ -1,7 +1,9 @@
 import tempfile
+import urllib.error
 import zipfile
 import sqlite3
 from pathlib import Path
+from unittest.mock import MagicMock, patch
 
 from anki_skill.models import Card
 from anki_skill.exporters import export_tsv, _sanitize_tsv
@@ -179,3 +181,37 @@ def test_export_apkg_cloze_card():
     export_apkg(cards, path, deck_name="Cloze Test")
     assert path.stat().st_size > 0
     path.unlink()
+
+
+from anki_skill.exporters import export_ankiconnect, _ankiconnect_request
+
+
+def test_export_ankiconnect_builds_correct_notes():
+    """AnkiConnect export should build correct note structure."""
+    cards = [
+        Card(question="<b>Q1</b>", answer="A1<br><br>nidd123", tags=["tag1"]),
+        Card(question="{{c1::Mitochondria}} is X.", answer="", tags=["bio"]),
+    ]
+
+    mock_response = MagicMock()
+    mock_response.read.return_value = b'{"result": [1, 2], "error": null}'
+    mock_response.__enter__ = lambda s: s
+    mock_response.__exit__ = MagicMock(return_value=False)
+
+    with patch("anki_skill.exporters.urllib.request.urlopen", return_value=mock_response) as mock_urlopen:
+        added = export_ankiconnect(cards, deck_name="Test Deck")
+
+    assert added == 2
+    # 3 calls: version check, createDeck, addNotes
+    assert mock_urlopen.call_count == 3
+
+
+def test_export_ankiconnect_connection_error():
+    """Should raise ConnectionError when Anki is not running."""
+    import pytest
+
+    cards = [Card(question="Q", answer="A", tags=[])]
+
+    with patch("anki_skill.exporters.urllib.request.urlopen", side_effect=urllib.error.URLError("refused")):
+        with pytest.raises(ConnectionError, match="Cannot connect"):
+            export_ankiconnect(cards)
