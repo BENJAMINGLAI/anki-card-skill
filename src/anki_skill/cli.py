@@ -45,7 +45,7 @@ def main(argv: list[str] | None = None) -> None:
         if not input_path.exists():
             print(f"Error: file not found: {args.input}", file=sys.stderr)
             sys.exit(1)
-        text = input_path.read_text(encoding="utf-8")
+        text = input_path.read_text(encoding="utf-8-sig")
 
     cards = parse_cards(text)
 

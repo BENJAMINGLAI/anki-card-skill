@@ -90,3 +90,15 @@ def test_cli_output_dir_permission_denied(tmp_path):
     result = _run_cli(str(input_file), "-f", "tsv", "-o", bad_output)
     assert result.returncode == 3
     assert "error" in result.stderr.lower()
+
+
+def test_cli_utf8_bom_input(tmp_path):
+    """Files with UTF-8 BOM should be parsed correctly."""
+    input_file = tmp_path / "bom.txt"
+    input_file.write_bytes(b"\xef\xbb\xbfQ1 | A1 | tag1\n")
+    output_file = tmp_path / "out.tsv"
+    result = _run_cli(str(input_file), "-f", "tsv", "-o", str(output_file))
+    assert result.returncode == 0
+    content = output_file.read_text(encoding="utf-8")
+    assert not content.startswith("\ufeff")
+    assert "Q1" in content
