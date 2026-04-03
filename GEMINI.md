@@ -1,0 +1,1 @@
+@./anki-expert/SKILL.md

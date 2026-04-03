@@ -55,7 +55,17 @@ gemini extensions install https://github.com/gong1414/anki-card-skill
 ### Codex
 
 ```
-获取并按照说明操作：https://raw.githubusercontent.com/gong1414/anki-card-skill/main/anki-expert/SKILL.md
+获取并按照说明操作：https://raw.githubusercontent.com/gong1414/anki-card-skill/main/.codex/INSTALL.md
+```
+
+### OpenCode
+
+在 `opencode.json` 中添加：
+
+```json
+{
+  "plugin": ["anki-expert@git+https://github.com/gong1414/anki-card-skill.git"]
+}
 ```
 
 ### 验证安装

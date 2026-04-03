@@ -1,0 +1,6 @@
+{
+  "name": "anki-expert",
+  "description": "Generate high-quality Anki flashcards from text or files, with automatic export to .tsv or .apkg format",
+  "version": "0.1.0",
+  "contextFileName": "GEMINI.md"
+}
