@@ -7,8 +7,8 @@ AI-powered Anki flashcard generator — works as a skill/plugin for Claude Code,
 ## Features
 
 - **Expert flashcard generation** — minimum information principle, structured HTML formatting, hierarchical tags
-- **Multiple input sources** — inline text, `.md`, `.txt`, `.pdf` files
-- **Auto export** — `.tsv` (direct Anki import) or `.apkg` (portable deck file)
+- **Multiple input sources** — inline text, `.md`, `.txt`, `.pdf` files, or URLs
+- **Auto export** — `.tsv` (direct Anki import), `.apkg` (portable deck), or push directly via AnkiConnect
 - **Chinese & English** — full CJK and mixed-language support
 - **Smart formatting** — cost-aware emphasis (bold / italic / highlight)
 - **Hierarchical tags** — multi-level `::` separated tags for structured knowledge
@@ -101,6 +101,12 @@ Or from a file:
 Create Anki flashcards from ./notes/lecture-5.md
 ```
 
+Or from a URL:
+
+```
+Make Anki cards from https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm
+```
+
 Claude generates cards following expert rules and automatically exports them.
 
 ### CLI Export Tool
@@ -114,6 +120,9 @@ anki-export cards.txt -f apkg -o output.apkg -d "My Deck"
 
 # stdin
 cat cards.txt | anki-export - -f tsv -o output.tsv
+
+# AnkiConnect (push directly to Anki)
+anki-export cards.txt --ankiconnect -d "My Deck"
 ```
 
 ## Card Format

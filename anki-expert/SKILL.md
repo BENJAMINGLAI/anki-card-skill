@@ -1,6 +1,6 @@
 ---
 name: anki-expert
-description: Generate high-quality Anki flashcards from user-provided text (inline or local .md/.txt/.pdf files) and auto-export to .tsv or .apkg format. Trigger when the user mentions Anki, flashcards, spaced repetition, study cards, memory cards, make cards, help me memorize, or .apkg files.
+description: Generate high-quality Anki flashcards from user-provided text (inline, local .md/.txt/.pdf files, or URLs) and auto-export to .tsv, .apkg, or push directly via AnkiConnect. Trigger when the user mentions Anki, flashcards, spaced repetition, study cards, memory cards, make cards, help me memorize, or .apkg files.
 ---
 
 # Anki Flashcard Expert Skill
@@ -9,8 +9,8 @@ description: Generate high-quality Anki flashcards from user-provided text (inli
 
 Activate when the user's request involves:
 - Creating/generating Anki cards or flashcards
-- Creating study cards from text or files
-- Exporting to .apkg or .tsv format
+- Creating study cards from text, files, or URLs
+- Exporting to .apkg or .tsv format, or pushing to Anki via AnkiConnect
 - Mentions of Anki, flashcard, or spaced repetition
 
 ---
@@ -23,7 +23,11 @@ Activate when the user's request involves:
 - If the user specifies a local file path (.md, .txt, .pdf), use the Read tool.
   - For PDFs, use the `pages` parameter to read in batches.
   - For large files, read and generate cards in batches.
-- If neither text nor file is provided, ask the user.
+- If the user provides a URL (starting with `http://` or `https://`):
+  - Use the WebFetch tool (or platform equivalent) to retrieve the page content.
+  - Strip navigation, ads, headers, footers, and other non-content elements. Focus on the main article/body text.
+  - If the page is very long, process it in sections.
+- If neither text, file, nor URL is provided, ask the user.
 
 ### Step 2: Check for nidd Identifier
 
