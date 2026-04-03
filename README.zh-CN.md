@@ -1,6 +1,8 @@
 # anki-expert
 
-一个 Claude Code 技能插件，从文本或本地文件生成高质量 Anki 闪卡，自动导出为 `.tsv` 或 `.apkg` 格式。
+一个 AI 编程助手技能插件，从文本或本地文件生成高质量 Anki 闪卡，自动导出为 `.tsv` 或 `.apkg` 格式。
+
+[English](README.md)
 
 ## 功能
 
@@ -10,27 +12,55 @@
 - **中英文支持** — 完整的中日韩文字和混合语言支持
 - **智能排版** — 成本感知的格式强调（加粗 / 斜体 / 标黄）
 - **层级标签** — 多级 `::` 分隔标签，构建知识体系
+- **nidd 追踪** — 来源编号导出时自动从答案剥离，移入标签字段
 
 ## 安装
 
 ### 前置条件
 
-导出工具 `anki-export` 需要先安装到系统 `PATH`：
+导出工具 `anki-export` 需要先安装：
 
 ```bash
 pip install git+https://github.com/gong1414/anki-card-skill.git
 ```
 
-### Claude Code 中安装
+### Claude Code
 
 ```
 /plugin marketplace add gong1414/anki-card-skill
 /plugin install anki-expert@anki-skill
 ```
 
+### Cursor
+
+```
+/add-plugin anki-expert
+```
+
+或在 Cursor 插件市场中搜索 "anki-expert"。
+
+### GitHub Copilot CLI
+
+```bash
+copilot plugin marketplace add gong1414/anki-card-skill
+copilot plugin install anki-expert@anki-skill
+```
+
+### Gemini CLI
+
+```bash
+gemini extensions install https://github.com/gong1414/anki-card-skill
+```
+
+### Codex
+
+```
+获取并按照说明操作：https://raw.githubusercontent.com/gong1414/anki-card-skill/main/anki-expert/SKILL.md
+```
+
 ### 验证安装
 
-启动新的 Claude Code 会话，输入：
+启动新会话，输入：
 
 ```
 帮我做 Anki 卡片：
@@ -44,9 +74,7 @@ nidd1234567890
 
 ## 使用方法
 
-### 在 Claude Code 中
-
-告诉 Claude 制作卡片：
+告诉 AI 助手制作卡片：
 
 ```
 帮我做 Anki 卡片：
@@ -62,7 +90,7 @@ nidd1726052151484
 从 ./notes/lecture-5.md 生成 Anki 闪卡
 ```
 
-Claude 会按照专家规则生成卡片并自动导出。
+AI 会按照专家规则生成卡片并自动导出。
 
 ### 命令行导出工具
 
@@ -84,7 +112,7 @@ cat cards.txt | anki-export - -f tsv -o output.tsv
 ```
 问题 | 答案 | 标签
 ------- | -------- | --------
-衰老细胞的<b>根本特征</b>？ | 细胞内 <b>水分减少</b>。<br><br>nidd123 | 生物学::细胞衰老
+衰老细胞的<b>根本特征</b>？ | 细胞内 <b>水分减少</b>。 | 生物学::细胞衰老
 ```
 
 ### HTML 标签
