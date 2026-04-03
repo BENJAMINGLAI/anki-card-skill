@@ -17,23 +17,17 @@ A Claude Code skill for generating high-quality Anki flashcards from text or loc
 
 ```bash
 # 1. Install the export tool (needed for .tsv / .apkg export)
-cd /path/to/this/repo
-pip install -e .
+pip install git+https://github.com/gong1414/anki-card-skill.git
 
-# 2. Add this repo as a Claude Code marketplace
-claude plugin marketplace add /path/to/this/repo
-# or from GitHub:
-# claude plugin marketplace add YOUR_USERNAME/newankiskill
-
-# 3. Install the skill plugin
+# 2. Add marketplace and install the skill plugin
+claude plugin marketplace add gong1414/anki-card-skill
 claude plugin install anki-expert
 ```
 
 ### CLI Only (export tool)
 
 ```bash
-cd /path/to/this/repo
-pip install -e .
+pip install git+https://github.com/gong1414/anki-card-skill.git
 ```
 
 ## Usage
@@ -103,11 +97,9 @@ Hierarchical tags using `::` separator:
 Push this repo to GitHub, then anyone can install with:
 
 ```bash
-claude plugin marketplace add YOUR_USERNAME/newankiskill
+claude plugin marketplace add gong1414/anki-card-skill
 claude plugin install anki-expert
 ```
-
-To submit to the official Anthropic marketplace, open a PR at [anthropics/claude-plugins-official](https://github.com/anthropics/claude-plugins-official).
 
 ## License
 
