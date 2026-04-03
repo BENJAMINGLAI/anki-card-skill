@@ -1,0 +1,59 @@
+import tempfile
+from pathlib import Path
+
+from anki_skill.models import Card
+from anki_skill.exporters import export_tsv
+
+
+def _sample_cards() -> list[Card]:
+    return [
+        Card(
+            question="<b>Q1</b>",
+            answer="A1<br><br>nidd123",
+            tags=["tag1::sub"],
+        ),
+        Card(
+            question="Q2",
+            answer="<ul><li>A2a</li><li>A2b</li></ul>",
+            tags=["tag2", "tag3"],
+        ),
+    ]
+
+
+def test_export_tsv_creates_file():
+    cards = _sample_cards()
+    with tempfile.NamedTemporaryFile(suffix=".tsv", delete=False) as f:
+        path = Path(f.name)
+    export_tsv(cards, path)
+    assert path.exists()
+    content = path.read_text(encoding="utf-8")
+    lines = content.strip().splitlines()
+    assert len(lines) == 2  # no header, Anki TSV has no header
+    path.unlink()
+
+
+def test_export_tsv_tab_separated():
+    cards = _sample_cards()
+    with tempfile.NamedTemporaryFile(suffix=".tsv", delete=False) as f:
+        path = Path(f.name)
+    export_tsv(cards, path)
+    content = path.read_text(encoding="utf-8")
+    first_line = content.splitlines()[0]
+    parts = first_line.split("\t")
+    assert len(parts) == 3  # question, answer, tags
+    assert parts[0] == "<b>Q1</b>"
+    assert parts[1] == "A1<br><br>nidd123"
+    assert parts[2] == "tag1::sub"
+    path.unlink()
+
+
+def test_export_tsv_multiple_tags_space_joined():
+    cards = _sample_cards()
+    with tempfile.NamedTemporaryFile(suffix=".tsv", delete=False) as f:
+        path = Path(f.name)
+    export_tsv(cards, path)
+    content = path.read_text(encoding="utf-8")
+    second_line = content.splitlines()[1]
+    parts = second_line.split("\t")
+    assert parts[2] == "tag2 tag3"
+    path.unlink()
