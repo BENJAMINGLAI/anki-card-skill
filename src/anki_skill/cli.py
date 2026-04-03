@@ -6,7 +6,7 @@ import argparse
 import sys
 from pathlib import Path
 
-from anki_skill.exporters import export_apkg, export_tsv
+from anki_skill.exporters import export_ankiconnect, export_apkg, export_tsv
 from anki_skill.parser import parse_cards
 
 
@@ -67,8 +67,6 @@ def main(argv: list[str] | None = None) -> None:
         sys.exit(2)
 
     if args.ankiconnect:
-        from anki_skill.exporters import export_ankiconnect
-
         try:
             added = export_ankiconnect(cards, deck_name=args.deck_name)
         except ConnectionError as e:

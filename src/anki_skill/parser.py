@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import sys
+
 from anki_skill.models import Card
 
 
@@ -35,7 +37,6 @@ def parse_cards(text: str, verbose: bool = False) -> list[Card]:
         cards.append(Card(question=question, answer=answer, tags=tags))
 
     if verbose and skipped:
-        import sys
         for line_num, line in skipped:
             preview = line[:60] + "..." if len(line) > 60 else line
             print(f"  Skipped line {line_num}: {preview}", file=sys.stderr)

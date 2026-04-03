@@ -23,7 +23,7 @@ classifiers = [
     "Topic :: Education",
 ]
 dependencies = [
-    "genanki>=0.13.1",
+    "genanki>=0.13.1,<1.0",
 ]
 
 [project.urls]

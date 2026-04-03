@@ -80,7 +80,7 @@ def export_apkg(
     deck_name: str = "AnkiSkill Export",
 ) -> None:
     """Export cards to .apkg format using genanki."""
-    deck_id = int(hashlib.sha256(deck_name.encode()).hexdigest(), 16) % (2**31)
+    deck_id = int(hashlib.sha256(deck_name.encode()).hexdigest(), 16) % (2**31) or 1
     deck = genanki.Deck(deck_id, deck_name)
 
     for card in cards:
@@ -139,6 +139,10 @@ def export_ankiconnect(
             "Cannot connect to AnkiConnect. "
             "Ensure Anki is running with AnkiConnect add-on installed (code: 2055492159)."
         ) from e
+    except RuntimeError as e:
+        raise ConnectionError(
+            f"AnkiConnect responded with an error: {e}"
+        ) from e
 
     # Create deck if it doesn't exist
     _ankiconnect_request("createDeck", {"deck": deck_name})
@@ -181,6 +185,7 @@ def export_ankiconnect(
     if added == 0 and len(cards) > 0:
         raise RuntimeError(
             "No cards were accepted by Anki. "
-            "Check that 'Basic' and 'Cloze' note types exist in your collection."
+            "Check that note types named 'Basic' (fields: Front, Back) "
+            "and 'Cloze' (fields: Text, Extra) exist in your collection."
         )
     return added

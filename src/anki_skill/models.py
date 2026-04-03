@@ -40,5 +40,5 @@ class Card:
 
     @property
     def is_cloze(self) -> bool:
-        """Check if this card uses cloze deletion syntax."""
-        return "{{c" in self.question and "}}" in self.question
+        """Check if this card uses cloze deletion syntax (e.g., {{c1::text}})."""
+        return bool(re.search(r"\{\{c\d+::", self.question))

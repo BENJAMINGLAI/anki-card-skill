@@ -1,12 +1,22 @@
+import sqlite3
 import tempfile
 import urllib.error
 import zipfile
-import sqlite3
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
+import pytest
+
+from anki_skill.exporters import (
+    _sanitize_tsv,
+    export_ankiconnect,
+    export_apkg,
+    export_tsv,
+)
 from anki_skill.models import Card
-from anki_skill.exporters import export_tsv, _sanitize_tsv
+
+
+# --- _sanitize_tsv ---
 
 
 def test_sanitize_tsv_removes_tabs():
@@ -29,6 +39,9 @@ def test_sanitize_tsv_passthrough_clean_string():
     assert _sanitize_tsv("<b>hello</b>") == "<b>hello</b>"
 
 
+# --- Helpers ---
+
+
 def _sample_cards() -> list[Card]:
     return [
         Card(
@@ -44,113 +57,41 @@ def _sample_cards() -> list[Card]:
     ]
 
 
-def test_export_tsv_creates_file():
+# --- TSV export ---
+
+
+def test_export_tsv_creates_file(tmp_path):
     cards = _sample_cards()
-    with tempfile.NamedTemporaryFile(suffix=".tsv", delete=False) as f:
-        path = Path(f.name)
+    path = tmp_path / "out.tsv"
     export_tsv(cards, path)
     assert path.exists()
-    content = path.read_text(encoding="utf-8")
-    lines = content.strip().splitlines()
-    assert len(lines) == 2  # no header, Anki TSV has no header
-    path.unlink()
+    lines = path.read_text(encoding="utf-8").strip().splitlines()
+    assert len(lines) == 2
 
 
-def test_export_tsv_tab_separated():
+def test_export_tsv_tab_separated(tmp_path):
     cards = _sample_cards()
-    with tempfile.NamedTemporaryFile(suffix=".tsv", delete=False) as f:
-        path = Path(f.name)
+    path = tmp_path / "out.tsv"
     export_tsv(cards, path)
-    content = path.read_text(encoding="utf-8")
-    first_line = content.splitlines()[0]
+    first_line = path.read_text(encoding="utf-8").splitlines()[0]
     parts = first_line.split("\t")
-    assert len(parts) == 3  # question, answer, tags
+    assert len(parts) == 3
     assert parts[0] == "<b>Q1</b>"
     assert parts[1] == "A1"  # nidd stripped from answer
     assert "tag1::sub" in parts[2]
     assert "nidd123" in parts[2]  # nidd moved to tags
-    path.unlink()
 
 
-def test_export_tsv_multiple_tags_space_joined():
+def test_export_tsv_multiple_tags_space_joined(tmp_path):
     cards = _sample_cards()
-    with tempfile.NamedTemporaryFile(suffix=".tsv", delete=False) as f:
-        path = Path(f.name)
+    path = tmp_path / "out.tsv"
     export_tsv(cards, path)
-    content = path.read_text(encoding="utf-8")
-    second_line = content.splitlines()[1]
+    second_line = path.read_text(encoding="utf-8").splitlines()[1]
     parts = second_line.split("\t")
     assert parts[2] == "tag2 tag3"
-    path.unlink()
 
 
-from anki_skill.exporters import export_apkg
-
-
-def test_export_apkg_creates_file():
-    cards = _sample_cards()
-    with tempfile.NamedTemporaryFile(suffix=".apkg", delete=False) as f:
-        path = Path(f.name)
-    export_apkg(cards, path, deck_name="Test Deck")
-    assert path.exists()
-    assert path.stat().st_size > 0
-    path.unlink()
-
-
-def test_export_apkg_default_deck_name():
-    cards = _sample_cards()
-    with tempfile.NamedTemporaryFile(suffix=".apkg", delete=False) as f:
-        path = Path(f.name)
-    export_apkg(cards, path)
-    assert path.exists()
-    path.unlink()
-
-
-def test_export_apkg_preserves_html():
-    cards = [Card(question="<b>Bold Q</b>", answer="<i>Italic A</i>", tags=[])]
-    with tempfile.NamedTemporaryFile(suffix=".apkg", delete=False) as f:
-        path = Path(f.name)
-    export_apkg(cards, path, deck_name="HTML Test")
-    assert path.stat().st_size > 0
-    path.unlink()
-
-
-def test_export_apkg_nidd_in_tags():
-    """APKG export should move nidd from answer to tags."""
-    cards = [
-        Card(
-            question="Q",
-            answer="A<br><br>nidd999",
-            tags=["tag1"],
-        )
-    ]
-    with tempfile.NamedTemporaryFile(suffix=".apkg", delete=False) as f:
-        path = Path(f.name)
-    export_apkg(cards, path, deck_name="nidd test")
-
-    # APKG is a zip containing an SQLite database
-    with zipfile.ZipFile(path, "r") as z:
-        db_name = [n for n in z.namelist() if n.endswith(".anki2")][0]
-        db_bytes = z.read(db_name)
-
-    db_path = Path(tempfile.mktemp(suffix=".anki2"))
-    db_path.write_bytes(db_bytes)
-    conn = sqlite3.connect(str(db_path))
-    row = conn.execute("SELECT tags, flds FROM notes").fetchone()
-    conn.close()
-    db_path.unlink()
-    path.unlink()
-
-    tags_str = row[0]  # space-separated tags
-    flds_str = row[1]  # fields separated by \x1f
-    assert "nidd999" in tags_str
-    assert "tag1" in tags_str
-    # nidd should be stripped from the answer field
-    answer_field = flds_str.split("\x1f")[1]
-    assert "nidd999" not in answer_field
-
-
-def test_export_tsv_cloze_card():
+def test_export_tsv_cloze_card(tmp_path):
     """Cloze cards should export with cloze syntax preserved."""
     cards = [
         Card(
@@ -159,15 +100,64 @@ def test_export_tsv_cloze_card():
             tags=["biology"],
         )
     ]
-    with tempfile.NamedTemporaryFile(suffix=".tsv", delete=False) as f:
-        path = Path(f.name)
+    path = tmp_path / "out.tsv"
     export_tsv(cards, path)
     content = path.read_text(encoding="utf-8")
     assert "{{c1::Mitochondria}}" in content
-    path.unlink()
 
 
-def test_export_apkg_cloze_card():
+# --- APKG export ---
+
+
+def test_export_apkg_creates_file(tmp_path):
+    cards = _sample_cards()
+    path = tmp_path / "out.apkg"
+    export_apkg(cards, path, deck_name="Test Deck")
+    assert path.exists()
+    assert path.stat().st_size > 0
+
+
+def test_export_apkg_default_deck_name(tmp_path):
+    cards = _sample_cards()
+    path = tmp_path / "out.apkg"
+    export_apkg(cards, path)
+    assert path.exists()
+
+
+def test_export_apkg_preserves_html(tmp_path):
+    cards = [Card(question="<b>Bold Q</b>", answer="<i>Italic A</i>", tags=[])]
+    path = tmp_path / "out.apkg"
+    export_apkg(cards, path, deck_name="HTML Test")
+    assert path.stat().st_size > 0
+
+
+def test_export_apkg_nidd_in_tags(tmp_path):
+    """APKG export should move nidd from answer to tags."""
+    cards = [
+        Card(question="Q", answer="A<br><br>nidd999", tags=["tag1"])
+    ]
+    path = tmp_path / "out.apkg"
+    export_apkg(cards, path, deck_name="nidd test")
+
+    with zipfile.ZipFile(path, "r") as z:
+        db_name = [n for n in z.namelist() if n.endswith(".anki2")][0]
+        db_bytes = z.read(db_name)
+
+    db_path = tmp_path / "temp.anki2"
+    db_path.write_bytes(db_bytes)
+    conn = sqlite3.connect(str(db_path))
+    row = conn.execute("SELECT tags, flds FROM notes").fetchone()
+    conn.close()
+
+    tags_str = row[0]
+    flds_str = row[1]
+    assert "nidd999" in tags_str
+    assert "tag1" in tags_str
+    answer_field = flds_str.split("\x1f")[1]
+    assert "nidd999" not in answer_field
+
+
+def test_export_apkg_cloze_card(tmp_path):
     """APKG export should use Cloze model for cloze cards."""
     cards = [
         Card(
@@ -176,14 +166,12 @@ def test_export_apkg_cloze_card():
             tags=["biology"],
         )
     ]
-    with tempfile.NamedTemporaryFile(suffix=".apkg", delete=False) as f:
-        path = Path(f.name)
+    path = tmp_path / "out.apkg"
     export_apkg(cards, path, deck_name="Cloze Test")
     assert path.stat().st_size > 0
-    path.unlink()
 
 
-from anki_skill.exporters import export_ankiconnect, _ankiconnect_request
+# --- AnkiConnect export ---
 
 
 def test_export_ankiconnect_builds_correct_notes():
@@ -202,14 +190,11 @@ def test_export_ankiconnect_builds_correct_notes():
         added = export_ankiconnect(cards, deck_name="Test Deck")
 
     assert added == 2
-    # 3 calls: version check, createDeck, addNotes
-    assert mock_urlopen.call_count == 3
+    assert mock_urlopen.call_count == 3  # version, createDeck, addNotes
 
 
 def test_export_ankiconnect_connection_error():
     """Should raise ConnectionError when Anki is not running."""
-    import pytest
-
     cards = [Card(question="Q", answer="A", tags=[])]
 
     with patch("anki_skill.exporters.urllib.request.urlopen", side_effect=urllib.error.URLError("refused")):

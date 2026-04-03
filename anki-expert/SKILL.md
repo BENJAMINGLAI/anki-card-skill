@@ -317,4 +317,7 @@ anki-export cards.txt -f apkg -o output.apkg -d "Deck Name"
 
 # Read from stdin
 cat cards.txt | anki-export - -f tsv -o output.tsv
+
+# AnkiConnect (push directly to Anki)
+anki-export cards.txt --ankiconnect -d "Deck Name"
 ```
