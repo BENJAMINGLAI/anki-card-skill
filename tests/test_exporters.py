@@ -1,4 +1,6 @@
 import tempfile
+import zipfile
+import sqlite3
 from pathlib import Path
 
 from anki_skill.models import Card
@@ -109,3 +111,38 @@ def test_export_apkg_preserves_html():
     export_apkg(cards, path, deck_name="HTML Test")
     assert path.stat().st_size > 0
     path.unlink()
+
+
+def test_export_apkg_nidd_in_tags():
+    """APKG export should move nidd from answer to tags."""
+    cards = [
+        Card(
+            question="Q",
+            answer="A<br><br>nidd999",
+            tags=["tag1"],
+        )
+    ]
+    with tempfile.NamedTemporaryFile(suffix=".apkg", delete=False) as f:
+        path = Path(f.name)
+    export_apkg(cards, path, deck_name="nidd test")
+
+    # APKG is a zip containing an SQLite database
+    with zipfile.ZipFile(path, "r") as z:
+        db_name = [n for n in z.namelist() if n.endswith(".anki2")][0]
+        db_bytes = z.read(db_name)
+
+    db_path = Path(tempfile.mktemp(suffix=".anki2"))
+    db_path.write_bytes(db_bytes)
+    conn = sqlite3.connect(str(db_path))
+    row = conn.execute("SELECT tags, flds FROM notes").fetchone()
+    conn.close()
+    db_path.unlink()
+    path.unlink()
+
+    tags_str = row[0]  # space-separated tags
+    flds_str = row[1]  # fields separated by \x1f
+    assert "nidd999" in tags_str
+    assert "tag1" in tags_str
+    # nidd should be stripped from the answer field
+    answer_field = flds_str.split("\x1f")[1]
+    assert "nidd999" not in answer_field
