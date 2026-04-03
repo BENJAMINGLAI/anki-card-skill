@@ -28,3 +28,53 @@ def test_card_answer_plain_text():
         tags=[],
     )
     assert card.answer_plain == "加粗 和 斜体\n\nnidd123"
+
+
+from pathlib import Path
+from anki_skill.parser import parse_cards
+
+
+FIXTURES = Path(__file__).parent / "fixtures"
+
+
+def test_parse_cards_from_fixture():
+    text = (FIXTURES / "sample_cards.txt").read_text(encoding="utf-8")
+    cards = parse_cards(text)
+    assert len(cards) == 3
+
+
+def test_parse_cards_first_card():
+    text = (FIXTURES / "sample_cards.txt").read_text(encoding="utf-8")
+    cards = parse_cards(text)
+    assert "根本特征" in cards[0].question
+    assert "水分减少" in cards[0].answer
+    assert cards[0].tags == ["细胞生物学::细胞::细胞衰老::根本特征"]
+
+
+def test_parse_cards_multiple_tags():
+    text = "Q | A | tag1 tag2::sub\n"
+    cards = parse_cards(text)
+    assert len(cards) == 1
+    assert cards[0].tags == ["tag1", "tag2::sub"]
+
+
+def test_parse_cards_empty_input():
+    assert parse_cards("") == []
+    assert parse_cards("问题 | 答案 | 标签\n------|------|------\n") == []
+
+
+def test_parse_cards_strips_whitespace():
+    text = "  Q  |  A  |  tag  \n"
+    cards = parse_cards(text)
+    assert cards[0].question == "Q"
+    assert cards[0].answer == "A"
+    assert cards[0].tags == ["tag"]
+
+
+def test_parse_cards_pipe_in_html():
+    """Pipes inside HTML tags should not break parsing."""
+    text = 'What is <code>a | b</code>? | Bitwise OR | programming::operators\n'
+    cards = parse_cards(text)
+    assert len(cards) == 1
+    assert "<code>a | b</code>" in cards[0].question
+    assert cards[0].answer == "Bitwise OR"
