@@ -167,6 +167,28 @@ If a card has multiple answers for one question, choose:
   - Card 1: `In a paging system, how large are memory blocks? | Typically 4KB.`
   - Card 2: `What are the memory blocks in a paging system called? | Frames.`
 
+### Cloze Deletion Cards
+
+For fill-in-the-blank style cards, use Anki's cloze syntax:
+
+- Format: `{{c1::answer}}` where `c1` is the cloze number.
+- Multiple clozes per card: `{{c1::first}} and {{c2::second}}`.
+- The question field contains the full text with cloze markers. The answer field can be empty or contain extra context.
+- Use cloze cards when the knowledge point is best tested by filling in a blank within a sentence, rather than as a standalone Q&A.
+
+**Example:**
+
+```
+Question | Answer | Tags
+------- | -------- | --------
+{{c1::Mitochondria}} is the powerhouse of the cell. |  | biology::cell_biology::organelles
+The process of {{c1::photosynthesis}} converts {{c2::light energy}} into {{c3::chemical energy}}. |  | biology::plants::photosynthesis
+```
+
+**When to use cloze vs. basic Q&A:**
+- **Cloze**: Definitions, terminology, fill-in-the-blank facts, sentence completion.
+- **Basic Q&A**: Explanations, comparisons, lists, multi-point answers.
+
 ### nidd Identifier
 
 - Append `<br><br>nidd` + digits at the end of each card's answer (e.g., `<br><br>nidd1728714524784`).
