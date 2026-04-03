@@ -51,6 +51,25 @@ _MODEL = genanki.Model(
     css=".card { font-family: arial; font-size: 20px; text-align: left; }"
 )
 
+_CLOZE_MODEL_ID = 1607392320
+_CLOZE_MODEL = genanki.Model(
+    _CLOZE_MODEL_ID,
+    "AnkiSkill Cloze",
+    model_type=genanki.Model.CLOZE,
+    fields=[
+        {"name": "Text"},
+        {"name": "Extra"},
+    ],
+    templates=[
+        {
+            "name": "Cloze",
+            "qfmt": "{{cloze:Text}}",
+            "afmt": "{{cloze:Text}}<br>{{Extra}}",
+        },
+    ],
+    css=".card { font-family: arial; font-size: 20px; text-align: left; } .cloze { font-weight: bold; color: blue; }",
+)
+
 
 def export_apkg(
     cards: list[Card],
@@ -65,11 +84,18 @@ def export_apkg(
         tags = list(card.tags)
         if card.nidd:
             tags.append(card.nidd)
-        note = genanki.Note(
-            model=_MODEL,
-            fields=[card.question, card.answer_clean],
-            tags=tags,
-        )
+        if card.is_cloze:
+            note = genanki.Note(
+                model=_CLOZE_MODEL,
+                fields=[card.question, card.answer_clean],
+                tags=tags,
+            )
+        else:
+            note = genanki.Note(
+                model=_MODEL,
+                fields=[card.question, card.answer_clean],
+                tags=tags,
+            )
         deck.add_note(note)
 
     genanki.Package(deck).write_to_file(str(output_path))

@@ -163,3 +163,12 @@ def test_parse_cards_multiple_nidd():
     card = Card(question="Q", answer="A nidd111<br><br>nidd222", tags=[])
     assert card.nidd == "nidd222"
     assert "nidd111" in card.answer_clean
+
+
+def test_parse_cards_cloze_empty_answer():
+    """Cloze cards with empty answer should be accepted."""
+    text = "{{c1::Mitochondria}} is the powerhouse of the cell. |  | biology\n"
+    cards = parse_cards(text)
+    assert len(cards) == 1
+    assert "{{c1::Mitochondria}}" in cards[0].question
+    assert cards[0].answer == ""

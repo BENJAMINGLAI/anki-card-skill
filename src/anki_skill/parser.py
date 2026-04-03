@@ -69,7 +69,10 @@ def _split_card_line(line: str) -> tuple[str, str, str] | None:
     question = rest[:second_pipe].strip()
     answer = rest[second_pipe + 1 :].strip()
 
-    if not question or not answer:
+    if not question:
+        return None
+    # Allow empty answer for cloze deletion cards
+    if not answer and "{{c" not in question:
         return None
 
     return question, answer, tags_str

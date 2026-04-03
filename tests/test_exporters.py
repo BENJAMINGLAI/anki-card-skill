@@ -146,3 +146,36 @@ def test_export_apkg_nidd_in_tags():
     # nidd should be stripped from the answer field
     answer_field = flds_str.split("\x1f")[1]
     assert "nidd999" not in answer_field
+
+
+def test_export_tsv_cloze_card():
+    """Cloze cards should export with cloze syntax preserved."""
+    cards = [
+        Card(
+            question="{{c1::Mitochondria}} is the powerhouse of the cell.",
+            answer="",
+            tags=["biology"],
+        )
+    ]
+    with tempfile.NamedTemporaryFile(suffix=".tsv", delete=False) as f:
+        path = Path(f.name)
+    export_tsv(cards, path)
+    content = path.read_text(encoding="utf-8")
+    assert "{{c1::Mitochondria}}" in content
+    path.unlink()
+
+
+def test_export_apkg_cloze_card():
+    """APKG export should use Cloze model for cloze cards."""
+    cards = [
+        Card(
+            question="{{c1::Mitochondria}} is the powerhouse of the cell.",
+            answer="",
+            tags=["biology"],
+        )
+    ]
+    with tempfile.NamedTemporaryFile(suffix=".apkg", delete=False) as f:
+        path = Path(f.name)
+    export_apkg(cards, path, deck_name="Cloze Test")
+    assert path.stat().st_size > 0
+    path.unlink()

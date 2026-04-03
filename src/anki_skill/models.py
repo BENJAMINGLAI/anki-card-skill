@@ -37,3 +37,8 @@ class Card:
         text = re.sub(r"<br\s*/?>", "\n", text)
         text = re.sub(r"<[^>]+>", "", text)
         return text
+
+    @property
+    def is_cloze(self) -> bool:
+        """Check if this card uses cloze deletion syntax."""
+        return "{{c" in self.question and "}}" in self.question
