@@ -16,19 +16,24 @@ A Claude Code skill for generating high-quality Anki flashcards from text or loc
 ### As a Claude Code Skill
 
 ```bash
-# 1. Install the export tool
-pip install anki-skill
-# or
-uv tool install anki-skill
+# 1. Install the export tool (needed for .tsv / .apkg export)
+cd /path/to/this/repo
+pip install -e .
 
-# 2. Install the skill in Claude Code
-claude skill add --from github:YOUR_USERNAME/newankiskill
+# 2. Add this repo as a Claude Code marketplace
+claude plugin marketplace add /path/to/this/repo
+# or from GitHub:
+# claude plugin marketplace add YOUR_USERNAME/newankiskill
+
+# 3. Install the skill plugin
+claude plugin install anki-expert
 ```
 
-### CLI Only
+### CLI Only (export tool)
 
 ```bash
-pip install anki-skill
+cd /path/to/this/repo
+pip install -e .
 ```
 
 ## Usage
@@ -93,13 +98,16 @@ Hierarchical tags using `::` separator:
 计算机科学::算法::图论::最短路径::单源最短路径
 ```
 
-## Publishing to Skill Registry
+## Publishing
 
-To submit this skill to the Claude Code skill registry:
+Push this repo to GitHub, then anyone can install with:
 
-1. Fork and push to your GitHub repository
-2. Open an issue or PR at [claude-skill-registry-core](https://github.com/majiayu000/claude-skill-registry-core)
-3. Include: skill name, repo URL, description, category (`productivity`)
+```bash
+claude plugin marketplace add YOUR_USERNAME/newankiskill
+claude plugin install anki-expert
+```
+
+To submit to the official Anthropic marketplace, open a PR at [anthropics/claude-plugins-official](https://github.com/anthropics/claude-plugins-official).
 
 ## License
 

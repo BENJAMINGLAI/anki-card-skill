@@ -1,0 +1,16 @@
+{
+  "name": "anki-skill",
+  "owner": {
+    "name": "anki-skill"
+  },
+  "plugins": [
+    {
+      "name": "anki-expert",
+      "description": "Generate high-quality Anki flashcards from text or files, with automatic export to .tsv or .apkg format",
+      "source": "./",
+      "skills": [
+        "./anki-expert"
+      ]
+    }
+  ]
+}
