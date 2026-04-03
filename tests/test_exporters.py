@@ -57,3 +57,34 @@ def test_export_tsv_multiple_tags_space_joined():
     parts = second_line.split("\t")
     assert parts[2] == "tag2 tag3"
     path.unlink()
+
+
+from anki_skill.exporters import export_apkg
+
+
+def test_export_apkg_creates_file():
+    cards = _sample_cards()
+    with tempfile.NamedTemporaryFile(suffix=".apkg", delete=False) as f:
+        path = Path(f.name)
+    export_apkg(cards, path, deck_name="Test Deck")
+    assert path.exists()
+    assert path.stat().st_size > 0
+    path.unlink()
+
+
+def test_export_apkg_default_deck_name():
+    cards = _sample_cards()
+    with tempfile.NamedTemporaryFile(suffix=".apkg", delete=False) as f:
+        path = Path(f.name)
+    export_apkg(cards, path)
+    assert path.exists()
+    path.unlink()
+
+
+def test_export_apkg_preserves_html():
+    cards = [Card(question="<b>Bold Q</b>", answer="<i>Italic A</i>", tags=[])]
+    with tempfile.NamedTemporaryFile(suffix=".apkg", delete=False) as f:
+        path = Path(f.name)
+    export_apkg(cards, path, deck_name="HTML Test")
+    assert path.stat().st_size > 0
+    path.unlink()
