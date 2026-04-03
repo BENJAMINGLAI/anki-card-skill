@@ -50,10 +50,11 @@ def main(argv: list[str] | None = None) -> None:
     cards = parse_cards(text)
 
     if not cards:
-        print("Warning: no cards parsed from input.", file=sys.stderr)
-        return
+        print("Error: no cards parsed from input.", file=sys.stderr)
+        sys.exit(2)
 
     output_path = Path(args.output)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
 
     if args.format == "tsv":
         export_tsv(cards, output_path)

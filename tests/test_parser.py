@@ -47,7 +47,8 @@ def test_card_answer_plain_text():
         answer="<b>加粗</b> 和 <i>斜体</i><br><br>nidd123",
         tags=[],
     )
-    assert card.answer_plain == "加粗 和 斜体\n\nnidd123"
+    # nidd stripped, HTML removed
+    assert card.answer_plain == "加粗 和 斜体"
 
 
 from pathlib import Path

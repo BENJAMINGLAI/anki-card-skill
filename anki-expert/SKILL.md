@@ -280,11 +280,7 @@ nidd1742293016393
 此 skill 依赖 Python CLI 工具 `anki-export`。安装方式：
 
 ```bash
-# 推荐
-uv tool install anki-skill
-
-# 或
-pip install anki-skill
+pip install git+https://github.com/gong1414/anki-card-skill.git
 ```
 
 安装后 `anki-export` 命令即可用于导出闪卡。

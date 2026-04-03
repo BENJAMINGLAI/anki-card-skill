@@ -32,8 +32,8 @@ class Card:
 
     @property
     def answer_plain(self) -> str:
-        """Answer with HTML tags stripped, <br> converted to newlines."""
-        text = self.answer
+        """Answer with nidd stripped and HTML tags removed, <br> converted to newlines."""
+        text = self.answer_clean
         text = re.sub(r"<br\s*/?>", "\n", text)
         text = re.sub(r"<[^>]+>", "", text)
         return text

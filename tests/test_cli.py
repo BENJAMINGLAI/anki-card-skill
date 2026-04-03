@@ -62,3 +62,18 @@ def test_cli_stdin():
 def test_cli_missing_input():
     result = _run_cli()
     assert result.returncode != 0
+
+
+def test_cli_file_not_found():
+    result = _run_cli("/nonexistent/file.txt", "-f", "tsv", "-o", "/tmp/out.tsv")
+    assert result.returncode == 1
+    assert "not found" in result.stderr.lower()
+
+
+def test_cli_empty_input_exits_nonzero():
+    with tempfile.NamedTemporaryFile(suffix=".txt", delete=False, mode="w") as f:
+        f.write("")
+        path = Path(f.name)
+    result = _run_cli(str(path), "-f", "tsv", "-o", "/tmp/out.tsv")
+    assert result.returncode == 2
+    path.unlink()

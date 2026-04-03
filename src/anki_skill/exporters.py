@@ -10,6 +10,11 @@ import genanki
 from anki_skill.models import Card
 
 
+def _sanitize_tsv(value: str) -> str:
+    """Remove characters that would corrupt TSV structure."""
+    return value.replace("\t", " ").replace("\n", "<br>").replace("\r", "")
+
+
 def export_tsv(cards: list[Card], output_path: Path) -> None:
     """Export cards to TSV format for Anki import.
 
@@ -21,7 +26,9 @@ def export_tsv(cards: list[Card], output_path: Path) -> None:
             tags = card.tags_string
             if card.nidd:
                 tags = f"{tags} {card.nidd}".strip()
-            line = f"{card.question}\t{card.answer_clean}\t{tags}\n"
+            q = _sanitize_tsv(card.question)
+            a = _sanitize_tsv(card.answer_clean)
+            line = f"{q}\t{a}\t{tags}\n"
             f.write(line)
 
 
